@@ -1,10 +1,10 @@
-# Makefile template for t90
+# Makefile template for t3e
 
 FC = f90
 LD = f90
 CPPFLAGS = -F
-FFLAGS = -O2
-LDFLAGS = -Wl"-Dpreset=nan $(LIBS)"
+FFLAGS = -dp -O2,unroll2
+LDFLAGS = -Wl"-Dpreset=nan;streams=on;permok=yes -Xm $(LIBS)"
 LIST = -O negmsgs -rs
 
 # you should never need to change any lines below.
@@ -25,16 +25,13 @@ LIST = -O negmsgs -rs
 # make <file>.i		create a preprocessed file (only for .F and .F90
 #			extensions)
 
-# make <file>.hpm	produce hpm output from <file>.x
-# make <file>.proc	produce procstat output from <file>.x
-
 # The macro TMPFILES is provided to slate files like the above for removal.
 
 RM = rm -f
 SHELL = /bin/csh
-TMPFILES = .*.m *.T *.TT *.hpm *.i *.lst *.proc *.s
+TMPFILES = .*.m *.T *.TT *.i *.lst *.s
 
-.SUFFIXES: .F .F90 .H .T .f .F90 .h .hpm .i .lst .proc .o .s .x
+.SUFFIXES: .F .F90 .H .T .f .F90 .h .i .lst .o .s .x
 
 .f.T:
 	$(FC) $(FFLAGS) -c -Ca $*.f
@@ -80,7 +77,3 @@ TMPFILES = .*.m *.T *.TT *.hpm *.i *.lst *.proc *.s
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FFLAGS) -c -eS $*.F90
 .F90.x:
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FFLAGS) $(LDFLAGS) -o $*.x $*.F90
-.x.proc:
-	procstat -R $*.proc $*.x
-.x.hpm:
-	hpm -r -o $*.hpm $*.x

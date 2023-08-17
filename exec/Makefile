@@ -128,143 +128,143 @@ vegn_static_override.o: $(SRCROOT)land_lad2/vegetation/vegn_static_override.F90 
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) -c -I/Users/eweng/lm3ppa/src/land_lad2/vegetation	$(SRCROOT)land_lad2/vegetation/vegn_static_override.F90
 vegn_tile.o: $(SRCROOT)land_lad2/vegetation/vegn_tile.F90 utilities.o constants.o land_constants.o land_tile_diag_sel.o vegn_data.o vegn_cohort.o soil_tile.o
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) -c	$(SRCROOT)land_lad2/vegetation/vegn_tile.F90
-./glacier.F90: $(SRCROOT)land_lad2/glacier/glacier.F90
-	cp $(SRCROOT)land_lad2/glacier/glacier.F90 .
-./soil.F90: $(SRCROOT)land_lad2/soil/soil.F90
-	cp $(SRCROOT)land_lad2/soil/soil.F90 .
-./time_interp.F90: $(SRCROOT)shared/time_interp/time_interp.F90
-	cp $(SRCROOT)shared/time_interp/time_interp.F90 .
-./vegn_data.F90: $(SRCROOT)land_lad2/vegetation/vegn_data.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegn_data.F90 .
-./vegetation.F90: $(SRCROOT)land_lad2/vegetation/vegetation.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegetation.F90 .
-./uptake.F90: $(SRCROOT)land_lad2/soil/uptake.F90
-	cp $(SRCROOT)land_lad2/soil/uptake.F90 .
-./river.F90: $(SRCROOT)land_lad2/river/river.F90
-	cp $(SRCROOT)land_lad2/river/river.F90 .
-./land_tile_io.F90: $(SRCROOT)land_lad2/shared/land_tile_io.F90
-	cp $(SRCROOT)land_lad2/shared/land_tile_io.F90 .
-./vegn_photosynthesis.F90: $(SRCROOT)land_lad2/vegetation/vegn_photosynthesis.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegn_photosynthesis.F90 .
-./land_constants.F90: $(SRCROOT)land_lad2/land_constants.F90
-	cp $(SRCROOT)land_lad2/land_constants.F90 .
-./land_io.F90: $(SRCROOT)land_lad2/shared/land_io.F90
-	cp $(SRCROOT)land_lad2/shared/land_io.F90 .
-./river_type.F90: $(SRCROOT)land_lad2/river/river_type.F90
-	cp $(SRCROOT)land_lad2/river/river_type.F90 .
-./vegn_cohort_io.inc: /Users/eweng/lm3ppa/src/land_lad2/vegetation/vegn_cohort_io.inc
-	cp /Users/eweng/lm3ppa/src/land_lad2/vegetation/vegn_cohort_io.inc .
-./vegn_cohort.F90: $(SRCROOT)land_lad2/vegetation/vegn_cohort.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegn_cohort.F90 .
-./vegn_harvesting.F90: $(SRCROOT)land_lad2/vegetation/vegn_harvesting.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegn_harvesting.F90 .
-./vegn_disturbance.F90: $(SRCROOT)land_lad2/vegetation/vegn_disturbance.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegn_disturbance.F90 .
-./getput.inc: /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput.inc
-	cp /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput.inc .
-./table_printer.F90: $(SRCROOT)land_lad2/shared/table_printer.F90
-	cp $(SRCROOT)land_lad2/shared/table_printer.F90 .
-./cana_tile.F90: $(SRCROOT)land_lad2/canopy_air/cana_tile.F90
-	cp $(SRCROOT)land_lad2/canopy_air/cana_tile.F90 .
-./monin_obukhov_interfaces.h: /Users/eweng/lm3ppa/src/atmos_param/monin_obukhov/monin_obukhov_interfaces.h
-	cp /Users/eweng/lm3ppa/src/atmos_param/monin_obukhov/monin_obukhov_interfaces.h .
 ./constants.F90: $(SRCROOT)shared/constants/constants.F90
 	cp $(SRCROOT)shared/constants/constants.F90 .
-./get_atmos_data.F90: $(SRCROOT)atmos_solo_land/get_atmos_data.F90
-	cp $(SRCROOT)atmos_solo_land/get_atmos_data.F90 .
-./utilities.F90: $(SRCROOT)shared/utilities/utilities.F90
-	cp $(SRCROOT)shared/utilities/utilities.F90 .
-./land_debug.F90: $(SRCROOT)land_lad2/shared/land_debug.F90
-	cp $(SRCROOT)land_lad2/shared/land_debug.F90 .
-./snow_tile.F90: $(SRCROOT)land_lad2/snow/snow_tile.F90
-	cp $(SRCROOT)land_lad2/snow/snow_tile.F90 .
-./nf_utils.F90: $(SRCROOT)land_lad2/shared/nf_utils/nf_utils.F90
-	cp $(SRCROOT)land_lad2/shared/nf_utils/nf_utils.F90 .
-./lake_tile.F90: $(SRCROOT)land_lad2/lake/lake_tile.F90
-	cp $(SRCROOT)land_lad2/lake/lake_tile.F90 .
-./platform.F90: $(SRCROOT)shared/platform/platform.F90
-	cp $(SRCROOT)shared/platform/platform.F90 .
-./land_tile_diag.F90: $(SRCROOT)land_lad2/shared/land_tile_diag.F90
-	cp $(SRCROOT)land_lad2/shared/land_tile_diag.F90 .
-./snow.F90: $(SRCROOT)land_lad2/snow/snow.F90
-	cp $(SRCROOT)land_lad2/snow/snow.F90 .
-./land_utils.F90: $(SRCROOT)land_lad2/shared/land_utils.F90
-	cp $(SRCROOT)land_lad2/shared/land_utils.F90 .
-./flux_exchange.F90: $(SRCROOT)coupler/flux_exchange.F90
-	cp $(SRCROOT)coupler/flux_exchange.F90 .
-./land_tile_diag_sel.F90: $(SRCROOT)land_lad2/shared/land_tile_diag_sel.F90
-	cp $(SRCROOT)land_lad2/shared/land_tile_diag_sel.F90 .
-./land_tile.F90: $(SRCROOT)land_lad2/land_tile.F90
-	cp $(SRCROOT)land_lad2/land_tile.F90 .
-./sphum.F90: $(SRCROOT)land_lad2/shared/sphum.F90
-	cp $(SRCROOT)land_lad2/shared/sphum.F90 .
-./debug.inc: /Users/eweng/lm3ppa/src/land_lad2/shared/debug.inc
-	cp /Users/eweng/lm3ppa/src/land_lad2/shared/debug.inc .
-./vegn_dynamics.F90: $(SRCROOT)land_lad2/vegetation/vegn_dynamics.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegn_dynamics.F90 .
-./land_model.F90: $(SRCROOT)land_lad2/land_model.F90
-	cp $(SRCROOT)land_lad2/land_model.F90 .
-./lake.F90: $(SRCROOT)land_lad2/lake/lake.F90
-	cp $(SRCROOT)land_lad2/lake/lake.F90 .
-./nfu.F90: $(SRCROOT)land_lad2/shared/nf_utils/nfu.F90
-	cp $(SRCROOT)land_lad2/shared/nf_utils/nfu.F90 .
-./sat_vapor_pres.F90: $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres.F90
-	cp $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres.F90 .
-./sat_vapor_pres_k.F90: $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres_k.F90
-	cp $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres_k.F90 .
-./fms_platform.h: /Users/eweng/lm3ppa/src/shared/include/fms_platform.h
-	cp /Users/eweng/lm3ppa/src/shared/include/fms_platform.h .
 ./nfc.F90: $(SRCROOT)land_lad2/shared/nf_utils/nfc.F90
 	cp $(SRCROOT)land_lad2/shared/nf_utils/nfc.F90 .
-./canopy_air.F90: $(SRCROOT)land_lad2/canopy_air/canopy_air.F90
-	cp $(SRCROOT)land_lad2/canopy_air/canopy_air.F90 .
-./glac_tile.F90: $(SRCROOT)land_lad2/glacier/glac_tile.F90
-	cp $(SRCROOT)land_lad2/glacier/glac_tile.F90 .
-./vegn_static_override.F90: $(SRCROOT)land_lad2/vegetation/vegn_static_override.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegn_static_override.F90 .
-./vegn_tile.F90: $(SRCROOT)land_lad2/vegetation/vegn_tile.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegn_tile.F90 .
-./get_cal_time.F90: $(SRCROOT)shared/time_manager/get_cal_time.F90
-	cp $(SRCROOT)shared/time_manager/get_cal_time.F90 .
-./land_data.F90: $(SRCROOT)land_lad2/land_data.F90
-	cp $(SRCROOT)land_lad2/land_data.F90 .
-./read_remap_cohort_data.inc: /Users/eweng/lm3ppa/src/land_lad2/vegetation/read_remap_cohort_data.inc
-	cp /Users/eweng/lm3ppa/src/land_lad2/vegetation/read_remap_cohort_data.inc .
-./vegn_radiation.F90: $(SRCROOT)land_lad2/vegetation/vegn_radiation.F90
-	cp $(SRCROOT)land_lad2/vegetation/vegn_radiation.F90 .
-./debug.inc: /Users/eweng/lm3ppa/src/land_lad2/canopy_air/../shared/debug.inc
-	cp /Users/eweng/lm3ppa/src/land_lad2/canopy_air/../shared/debug.inc .
-./soil_tile.F90: $(SRCROOT)land_lad2/soil/soil_tile.F90
-	cp $(SRCROOT)land_lad2/soil/soil_tile.F90 .
 ./astronomy.F90: $(SRCROOT)shared/astronomy/astronomy.F90
 	cp $(SRCROOT)shared/astronomy/astronomy.F90 .
-./monin_obukhov.F90: $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov.F90
-	cp $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov.F90 .
-./land_numerics.F90: $(SRCROOT)land_lad2/shared/land_numerics.F90
-	cp $(SRCROOT)land_lad2/shared/land_numerics.F90 .
+./land_data.F90: $(SRCROOT)land_lad2/land_data.F90
+	cp $(SRCROOT)land_lad2/land_data.F90 .
 ./vegn_cohort_io.F90: $(SRCROOT)land_lad2/vegetation/vegn_cohort_io.F90
 	cp $(SRCROOT)land_lad2/vegetation/vegn_cohort_io.F90 .
-./transitions.F90: $(SRCROOT)land_lad2/transitions/transitions.F90
-	cp $(SRCROOT)land_lad2/transitions/transitions.F90 .
-./monin_obukhov_kernel.F90: $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov_kernel.F90
-	cp $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov_kernel.F90 .
-./time_manager.F90: $(SRCROOT)shared/time_manager/time_manager.F90
-	cp $(SRCROOT)shared/time_manager/time_manager.F90 .
-./coupler_main.F90: $(SRCROOT)coupler/coupler_main.F90
-	cp $(SRCROOT)coupler/coupler_main.F90 .
-./topo_rough.F90: $(SRCROOT)land_lad2/topo_rough/topo_rough.F90
-	cp $(SRCROOT)land_lad2/topo_rough/topo_rough.F90 .
-./surface_flux.F90: $(SRCROOT)coupler/surface_flux.F90
-	cp $(SRCROOT)coupler/surface_flux.F90 .
-./atmos_model.F90: $(SRCROOT)atmos_solo_land/atmos_model.F90
-	cp $(SRCROOT)atmos_solo_land/atmos_model.F90 .
-./getput_compressed.inc: /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput_compressed.inc
-	cp /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput_compressed.inc .
 ./land_tile_diag_buff.F90: $(SRCROOT)land_lad2/shared/land_tile_diag_buff.F90
 	cp $(SRCROOT)land_lad2/shared/land_tile_diag_buff.F90 .
-SRC = $(SRCROOT)coupler/surface_flux.F90 $(SRCROOT)land_lad2/soil/soil.F90 $(SRCROOT)land_lad2/soil/uptake.F90 $(SRCROOT)land_lad2/vegetation/vegetation.F90 $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov_kernel.F90 $(SRCROOT)land_lad2/vegetation/vegn_dynamics.F90 $(SRCROOT)land_lad2/shared/land_debug.F90 $(SRCROOT)land_lad2/soil/soil_tile.F90 $(SRCROOT)land_lad2/land_model.F90 $(SRCROOT)coupler/flux_exchange.F90 $(SRCROOT)land_lad2/shared/sphum.F90 $(SRCROOT)land_lad2/river/river.F90 $(SRCROOT)land_lad2/vegetation/vegn_cohort.F90 $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres_k.F90 $(SRCROOT)land_lad2/shared/land_tile_diag_buff.F90 $(SRCROOT)land_lad2/vegetation/vegn_radiation.F90 $(SRCROOT)atmos_solo_land/get_atmos_data.F90 $(SRCROOT)land_lad2/vegetation/vegn_harvesting.F90 $(SRCROOT)land_lad2/land_constants.F90 $(SRCROOT)shared/constants/constants.F90 $(SRCROOT)land_lad2/shared/nf_utils/nfu.F90 $(SRCROOT)land_lad2/glacier/glacier.F90 $(SRCROOT)shared/astronomy/astronomy.F90 $(SRCROOT)atmos_solo_land/atmos_model.F90 $(SRCROOT)shared/time_manager/time_manager.F90 $(SRCROOT)land_lad2/shared/table_printer.F90 $(SRCROOT)land_lad2/shared/land_tile_diag.F90 $(SRCROOT)land_lad2/shared/land_tile_io.F90 $(SRCROOT)land_lad2/shared/land_utils.F90 $(SRCROOT)land_lad2/topo_rough/topo_rough.F90 $(SRCROOT)land_lad2/shared/land_io.F90 $(SRCROOT)coupler/coupler_main.F90 $(SRCROOT)land_lad2/canopy_air/cana_tile.F90 $(SRCROOT)land_lad2/vegetation/vegn_static_override.F90 $(SRCROOT)land_lad2/lake/lake.F90 $(SRCROOT)land_lad2/transitions/transitions.F90 $(SRCROOT)shared/time_manager/get_cal_time.F90 $(SRCROOT)land_lad2/lake/lake_tile.F90 $(SRCROOT)land_lad2/vegetation/vegn_cohort_io.F90 $(SRCROOT)shared/platform/platform.F90 $(SRCROOT)land_lad2/shared/land_numerics.F90 $(SRCROOT)land_lad2/vegetation/vegn_data.F90 $(SRCROOT)land_lad2/land_tile.F90 $(SRCROOT)land_lad2/vegetation/vegn_photosynthesis.F90 $(SRCROOT)land_lad2/glacier/glac_tile.F90 $(SRCROOT)land_lad2/land_data.F90 $(SRCROOT)land_lad2/vegetation/vegn_tile.F90 $(SRCROOT)land_lad2/river/river_type.F90 $(SRCROOT)land_lad2/shared/nf_utils/nf_utils.F90 $(SRCROOT)land_lad2/snow/snow.F90 $(SRCROOT)shared/time_interp/time_interp.F90 $(SRCROOT)land_lad2/shared/land_tile_diag_sel.F90 $(SRCROOT)land_lad2/canopy_air/canopy_air.F90 $(SRCROOT)land_lad2/snow/snow_tile.F90 $(SRCROOT)shared/utilities/utilities.F90 $(SRCROOT)land_lad2/shared/nf_utils/nfc.F90 $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres.F90 $(SRCROOT)land_lad2/vegetation/vegn_disturbance.F90 $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov.F90 /Users/eweng/lm3ppa/src/land_lad2/vegetation/vegn_cohort_io.inc /Users/eweng/lm3ppa/src/atmos_param/monin_obukhov/monin_obukhov_interfaces.h /Users/eweng/lm3ppa/src/land_lad2/canopy_air/../shared/debug.inc /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput_compressed.inc /Users/eweng/lm3ppa/src/land_lad2/shared/debug.inc /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput.inc /Users/eweng/lm3ppa/src/shared/include/fms_platform.h /Users/eweng/lm3ppa/src/land_lad2/vegetation/read_remap_cohort_data.inc
-OBJ = surface_flux.o soil.o uptake.o vegetation.o monin_obukhov_kernel.o vegn_dynamics.o land_debug.o soil_tile.o land_model.o flux_exchange.o sphum.o river.o vegn_cohort.o sat_vapor_pres_k.o land_tile_diag_buff.o vegn_radiation.o get_atmos_data.o vegn_harvesting.o land_constants.o constants.o nfu.o glacier.o astronomy.o atmos_model.o time_manager.o table_printer.o land_tile_diag.o land_tile_io.o land_utils.o topo_rough.o land_io.o coupler_main.o cana_tile.o vegn_static_override.o lake.o transitions.o get_cal_time.o lake_tile.o vegn_cohort_io.o platform.o land_numerics.o vegn_data.o land_tile.o vegn_photosynthesis.o glac_tile.o land_data.o vegn_tile.o river_type.o nf_utils.o snow.o time_interp.o land_tile_diag_sel.o canopy_air.o snow_tile.o utilities.o nfc.o sat_vapor_pres.o vegn_disturbance.o monin_obukhov.o
-OFF = $(SRCROOT)land_lad2/glacier/glacier.F90 $(SRCROOT)land_lad2/soil/soil.F90 $(SRCROOT)shared/time_interp/time_interp.F90 $(SRCROOT)land_lad2/vegetation/vegn_data.F90 $(SRCROOT)land_lad2/vegetation/vegetation.F90 $(SRCROOT)land_lad2/soil/uptake.F90 $(SRCROOT)land_lad2/river/river.F90 $(SRCROOT)land_lad2/shared/land_tile_io.F90 $(SRCROOT)land_lad2/vegetation/vegn_photosynthesis.F90 $(SRCROOT)land_lad2/land_constants.F90 $(SRCROOT)land_lad2/shared/land_io.F90 $(SRCROOT)land_lad2/river/river_type.F90 /Users/eweng/lm3ppa/src/land_lad2/vegetation/vegn_cohort_io.inc $(SRCROOT)land_lad2/vegetation/vegn_cohort.F90 $(SRCROOT)land_lad2/vegetation/vegn_harvesting.F90 $(SRCROOT)land_lad2/vegetation/vegn_disturbance.F90 /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput.inc $(SRCROOT)land_lad2/shared/table_printer.F90 $(SRCROOT)land_lad2/canopy_air/cana_tile.F90 /Users/eweng/lm3ppa/src/atmos_param/monin_obukhov/monin_obukhov_interfaces.h $(SRCROOT)shared/constants/constants.F90 $(SRCROOT)atmos_solo_land/get_atmos_data.F90 $(SRCROOT)shared/utilities/utilities.F90 $(SRCROOT)land_lad2/shared/land_debug.F90 $(SRCROOT)land_lad2/snow/snow_tile.F90 $(SRCROOT)land_lad2/shared/nf_utils/nf_utils.F90 $(SRCROOT)land_lad2/lake/lake_tile.F90 $(SRCROOT)shared/platform/platform.F90 $(SRCROOT)land_lad2/shared/land_tile_diag.F90 $(SRCROOT)land_lad2/snow/snow.F90 $(SRCROOT)land_lad2/shared/land_utils.F90 $(SRCROOT)coupler/flux_exchange.F90 $(SRCROOT)land_lad2/shared/land_tile_diag_sel.F90 $(SRCROOT)land_lad2/land_tile.F90 $(SRCROOT)land_lad2/shared/sphum.F90 /Users/eweng/lm3ppa/src/land_lad2/shared/debug.inc $(SRCROOT)land_lad2/vegetation/vegn_dynamics.F90 $(SRCROOT)land_lad2/land_model.F90 $(SRCROOT)land_lad2/lake/lake.F90 $(SRCROOT)land_lad2/shared/nf_utils/nfu.F90 $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres.F90 $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres_k.F90 /Users/eweng/lm3ppa/src/shared/include/fms_platform.h $(SRCROOT)land_lad2/shared/nf_utils/nfc.F90 $(SRCROOT)land_lad2/canopy_air/canopy_air.F90 $(SRCROOT)land_lad2/glacier/glac_tile.F90 $(SRCROOT)land_lad2/vegetation/vegn_static_override.F90 $(SRCROOT)land_lad2/vegetation/vegn_tile.F90 $(SRCROOT)shared/time_manager/get_cal_time.F90 $(SRCROOT)land_lad2/land_data.F90 /Users/eweng/lm3ppa/src/land_lad2/vegetation/read_remap_cohort_data.inc $(SRCROOT)land_lad2/vegetation/vegn_radiation.F90 /Users/eweng/lm3ppa/src/land_lad2/canopy_air/../shared/debug.inc $(SRCROOT)land_lad2/soil/soil_tile.F90 $(SRCROOT)shared/astronomy/astronomy.F90 $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov.F90 $(SRCROOT)land_lad2/shared/land_numerics.F90 $(SRCROOT)land_lad2/vegetation/vegn_cohort_io.F90 $(SRCROOT)land_lad2/transitions/transitions.F90 $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov_kernel.F90 $(SRCROOT)shared/time_manager/time_manager.F90 $(SRCROOT)coupler/coupler_main.F90 $(SRCROOT)land_lad2/topo_rough/topo_rough.F90 $(SRCROOT)coupler/surface_flux.F90 $(SRCROOT)atmos_solo_land/atmos_model.F90 /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput_compressed.inc $(SRCROOT)land_lad2/shared/land_tile_diag_buff.F90
+./land_utils.F90: $(SRCROOT)land_lad2/shared/land_utils.F90
+	cp $(SRCROOT)land_lad2/shared/land_utils.F90 .
+./debug.inc: /Users/eweng/lm3ppa/src/land_lad2/shared/debug.inc
+	cp /Users/eweng/lm3ppa/src/land_lad2/shared/debug.inc .
+./fms_platform.h: /Users/eweng/lm3ppa/src/shared/include/fms_platform.h
+	cp /Users/eweng/lm3ppa/src/shared/include/fms_platform.h .
+./vegn_cohort_io.inc: /Users/eweng/lm3ppa/src/land_lad2/vegetation/vegn_cohort_io.inc
+	cp /Users/eweng/lm3ppa/src/land_lad2/vegetation/vegn_cohort_io.inc .
+./glacier.F90: $(SRCROOT)land_lad2/glacier/glacier.F90
+	cp $(SRCROOT)land_lad2/glacier/glacier.F90 .
+./getput.inc: /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput.inc
+	cp /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput.inc .
+./sat_vapor_pres_k.F90: $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres_k.F90
+	cp $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres_k.F90 .
+./river.F90: $(SRCROOT)land_lad2/river/river.F90
+	cp $(SRCROOT)land_lad2/river/river.F90 .
+./land_tile_diag.F90: $(SRCROOT)land_lad2/shared/land_tile_diag.F90
+	cp $(SRCROOT)land_lad2/shared/land_tile_diag.F90 .
+./land_numerics.F90: $(SRCROOT)land_lad2/shared/land_numerics.F90
+	cp $(SRCROOT)land_lad2/shared/land_numerics.F90 .
+./surface_flux.F90: $(SRCROOT)coupler/surface_flux.F90
+	cp $(SRCROOT)coupler/surface_flux.F90 .
+./monin_obukhov_kernel.F90: $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov_kernel.F90
+	cp $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov_kernel.F90 .
+./flux_exchange.F90: $(SRCROOT)coupler/flux_exchange.F90
+	cp $(SRCROOT)coupler/flux_exchange.F90 .
+./lake.F90: $(SRCROOT)land_lad2/lake/lake.F90
+	cp $(SRCROOT)land_lad2/lake/lake.F90 .
+./lake_tile.F90: $(SRCROOT)land_lad2/lake/lake_tile.F90
+	cp $(SRCROOT)land_lad2/lake/lake_tile.F90 .
+./glac_tile.F90: $(SRCROOT)land_lad2/glacier/glac_tile.F90
+	cp $(SRCROOT)land_lad2/glacier/glac_tile.F90 .
+./nfu.F90: $(SRCROOT)land_lad2/shared/nf_utils/nfu.F90
+	cp $(SRCROOT)land_lad2/shared/nf_utils/nfu.F90 .
+./vegn_disturbance.F90: $(SRCROOT)land_lad2/vegetation/vegn_disturbance.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegn_disturbance.F90 .
+./soil_tile.F90: $(SRCROOT)land_lad2/soil/soil_tile.F90
+	cp $(SRCROOT)land_lad2/soil/soil_tile.F90 .
+./vegn_tile.F90: $(SRCROOT)land_lad2/vegetation/vegn_tile.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegn_tile.F90 .
+./monin_obukhov_interfaces.h: /Users/eweng/lm3ppa/src/atmos_param/monin_obukhov/monin_obukhov_interfaces.h
+	cp /Users/eweng/lm3ppa/src/atmos_param/monin_obukhov/monin_obukhov_interfaces.h .
+./land_model.F90: $(SRCROOT)land_lad2/land_model.F90
+	cp $(SRCROOT)land_lad2/land_model.F90 .
+./coupler_main.F90: $(SRCROOT)coupler/coupler_main.F90
+	cp $(SRCROOT)coupler/coupler_main.F90 .
+./snow.F90: $(SRCROOT)land_lad2/snow/snow.F90
+	cp $(SRCROOT)land_lad2/snow/snow.F90 .
+./land_io.F90: $(SRCROOT)land_lad2/shared/land_io.F90
+	cp $(SRCROOT)land_lad2/shared/land_io.F90 .
+./vegn_photosynthesis.F90: $(SRCROOT)land_lad2/vegetation/vegn_photosynthesis.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegn_photosynthesis.F90 .
+./snow_tile.F90: $(SRCROOT)land_lad2/snow/snow_tile.F90
+	cp $(SRCROOT)land_lad2/snow/snow_tile.F90 .
+./sphum.F90: $(SRCROOT)land_lad2/shared/sphum.F90
+	cp $(SRCROOT)land_lad2/shared/sphum.F90 .
+./transitions.F90: $(SRCROOT)land_lad2/transitions/transitions.F90
+	cp $(SRCROOT)land_lad2/transitions/transitions.F90 .
+./atmos_model.F90: $(SRCROOT)atmos_solo_land/atmos_model.F90
+	cp $(SRCROOT)atmos_solo_land/atmos_model.F90 .
+./utilities.F90: $(SRCROOT)shared/utilities/utilities.F90
+	cp $(SRCROOT)shared/utilities/utilities.F90 .
+./vegn_harvesting.F90: $(SRCROOT)land_lad2/vegetation/vegn_harvesting.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegn_harvesting.F90 .
+./get_atmos_data.F90: $(SRCROOT)atmos_solo_land/get_atmos_data.F90
+	cp $(SRCROOT)atmos_solo_land/get_atmos_data.F90 .
+./debug.inc: /Users/eweng/lm3ppa/src/land_lad2/canopy_air/../shared/debug.inc
+	cp /Users/eweng/lm3ppa/src/land_lad2/canopy_air/../shared/debug.inc .
+./table_printer.F90: $(SRCROOT)land_lad2/shared/table_printer.F90
+	cp $(SRCROOT)land_lad2/shared/table_printer.F90 .
+./read_remap_cohort_data.inc: /Users/eweng/lm3ppa/src/land_lad2/vegetation/read_remap_cohort_data.inc
+	cp /Users/eweng/lm3ppa/src/land_lad2/vegetation/read_remap_cohort_data.inc .
+./cana_tile.F90: $(SRCROOT)land_lad2/canopy_air/cana_tile.F90
+	cp $(SRCROOT)land_lad2/canopy_air/cana_tile.F90 .
+./vegn_data.F90: $(SRCROOT)land_lad2/vegetation/vegn_data.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegn_data.F90 .
+./vegn_static_override.F90: $(SRCROOT)land_lad2/vegetation/vegn_static_override.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegn_static_override.F90 .
+./land_constants.F90: $(SRCROOT)land_lad2/land_constants.F90
+	cp $(SRCROOT)land_lad2/land_constants.F90 .
+./vegn_cohort.F90: $(SRCROOT)land_lad2/vegetation/vegn_cohort.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegn_cohort.F90 .
+./time_manager.F90: $(SRCROOT)shared/time_manager/time_manager.F90
+	cp $(SRCROOT)shared/time_manager/time_manager.F90 .
+./monin_obukhov.F90: $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov.F90
+	cp $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov.F90 .
+./land_tile.F90: $(SRCROOT)land_lad2/land_tile.F90
+	cp $(SRCROOT)land_lad2/land_tile.F90 .
+./vegn_radiation.F90: $(SRCROOT)land_lad2/vegetation/vegn_radiation.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegn_radiation.F90 .
+./land_tile_diag_sel.F90: $(SRCROOT)land_lad2/shared/land_tile_diag_sel.F90
+	cp $(SRCROOT)land_lad2/shared/land_tile_diag_sel.F90 .
+./platform.F90: $(SRCROOT)shared/platform/platform.F90
+	cp $(SRCROOT)shared/platform/platform.F90 .
+./get_cal_time.F90: $(SRCROOT)shared/time_manager/get_cal_time.F90
+	cp $(SRCROOT)shared/time_manager/get_cal_time.F90 .
+./river_type.F90: $(SRCROOT)land_lad2/river/river_type.F90
+	cp $(SRCROOT)land_lad2/river/river_type.F90 .
+./nf_utils.F90: $(SRCROOT)land_lad2/shared/nf_utils/nf_utils.F90
+	cp $(SRCROOT)land_lad2/shared/nf_utils/nf_utils.F90 .
+./vegn_dynamics.F90: $(SRCROOT)land_lad2/vegetation/vegn_dynamics.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegn_dynamics.F90 .
+./getput_compressed.inc: /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput_compressed.inc
+	cp /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput_compressed.inc .
+./vegetation.F90: $(SRCROOT)land_lad2/vegetation/vegetation.F90
+	cp $(SRCROOT)land_lad2/vegetation/vegetation.F90 .
+./canopy_air.F90: $(SRCROOT)land_lad2/canopy_air/canopy_air.F90
+	cp $(SRCROOT)land_lad2/canopy_air/canopy_air.F90 .
+./land_debug.F90: $(SRCROOT)land_lad2/shared/land_debug.F90
+	cp $(SRCROOT)land_lad2/shared/land_debug.F90 .
+./topo_rough.F90: $(SRCROOT)land_lad2/topo_rough/topo_rough.F90
+	cp $(SRCROOT)land_lad2/topo_rough/topo_rough.F90 .
+./uptake.F90: $(SRCROOT)land_lad2/soil/uptake.F90
+	cp $(SRCROOT)land_lad2/soil/uptake.F90 .
+./land_tile_io.F90: $(SRCROOT)land_lad2/shared/land_tile_io.F90
+	cp $(SRCROOT)land_lad2/shared/land_tile_io.F90 .
+./time_interp.F90: $(SRCROOT)shared/time_interp/time_interp.F90
+	cp $(SRCROOT)shared/time_interp/time_interp.F90 .
+./sat_vapor_pres.F90: $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres.F90
+	cp $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres.F90 .
+./soil.F90: $(SRCROOT)land_lad2/soil/soil.F90
+	cp $(SRCROOT)land_lad2/soil/soil.F90 .
+SRC = $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres_k.F90 $(SRCROOT)land_lad2/soil/soil_tile.F90 $(SRCROOT)land_lad2/vegetation/vegn_harvesting.F90 $(SRCROOT)land_lad2/lake/lake_tile.F90 $(SRCROOT)land_lad2/shared/nf_utils/nfc.F90 $(SRCROOT)land_lad2/vegetation/vegetation.F90 $(SRCROOT)land_lad2/river/river.F90 $(SRCROOT)land_lad2/topo_rough/topo_rough.F90 $(SRCROOT)land_lad2/river/river_type.F90 $(SRCROOT)shared/constants/constants.F90 $(SRCROOT)land_lad2/soil/soil.F90 $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres.F90 $(SRCROOT)land_lad2/vegetation/vegn_tile.F90 $(SRCROOT)land_lad2/canopy_air/canopy_air.F90 $(SRCROOT)land_lad2/shared/sphum.F90 $(SRCROOT)land_lad2/land_model.F90 $(SRCROOT)land_lad2/vegetation/vegn_static_override.F90 $(SRCROOT)land_lad2/lake/lake.F90 $(SRCROOT)land_lad2/shared/land_tile_io.F90 $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov.F90 $(SRCROOT)shared/platform/platform.F90 $(SRCROOT)land_lad2/land_data.F90 $(SRCROOT)land_lad2/transitions/transitions.F90 $(SRCROOT)land_lad2/land_constants.F90 $(SRCROOT)land_lad2/shared/land_numerics.F90 $(SRCROOT)atmos_solo_land/atmos_model.F90 $(SRCROOT)land_lad2/vegetation/vegn_disturbance.F90 $(SRCROOT)coupler/coupler_main.F90 $(SRCROOT)land_lad2/vegetation/vegn_data.F90 $(SRCROOT)coupler/surface_flux.F90 $(SRCROOT)shared/utilities/utilities.F90 $(SRCROOT)land_lad2/snow/snow_tile.F90 $(SRCROOT)shared/time_manager/time_manager.F90 $(SRCROOT)land_lad2/shared/land_tile_diag_buff.F90 $(SRCROOT)land_lad2/shared/table_printer.F90 $(SRCROOT)land_lad2/vegetation/vegn_cohort_io.F90 $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov_kernel.F90 $(SRCROOT)shared/astronomy/astronomy.F90 $(SRCROOT)land_lad2/shared/land_io.F90 $(SRCROOT)land_lad2/shared/land_utils.F90 $(SRCROOT)land_lad2/vegetation/vegn_radiation.F90 $(SRCROOT)land_lad2/shared/nf_utils/nfu.F90 $(SRCROOT)land_lad2/glacier/glacier.F90 $(SRCROOT)land_lad2/shared/land_debug.F90 $(SRCROOT)land_lad2/canopy_air/cana_tile.F90 $(SRCROOT)land_lad2/shared/nf_utils/nf_utils.F90 $(SRCROOT)land_lad2/land_tile.F90 $(SRCROOT)land_lad2/glacier/glac_tile.F90 $(SRCROOT)land_lad2/vegetation/vegn_cohort.F90 $(SRCROOT)land_lad2/vegetation/vegn_dynamics.F90 $(SRCROOT)coupler/flux_exchange.F90 $(SRCROOT)land_lad2/snow/snow.F90 $(SRCROOT)land_lad2/soil/uptake.F90 $(SRCROOT)atmos_solo_land/get_atmos_data.F90 $(SRCROOT)land_lad2/shared/land_tile_diag_sel.F90 $(SRCROOT)land_lad2/shared/land_tile_diag.F90 $(SRCROOT)land_lad2/vegetation/vegn_photosynthesis.F90 $(SRCROOT)shared/time_manager/get_cal_time.F90 $(SRCROOT)shared/time_interp/time_interp.F90 /Users/eweng/lm3ppa/src/atmos_param/monin_obukhov/monin_obukhov_interfaces.h /Users/eweng/lm3ppa/src/shared/include/fms_platform.h /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput_compressed.inc /Users/eweng/lm3ppa/src/land_lad2/shared/debug.inc /Users/eweng/lm3ppa/src/land_lad2/vegetation/vegn_cohort_io.inc /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput.inc /Users/eweng/lm3ppa/src/land_lad2/canopy_air/../shared/debug.inc /Users/eweng/lm3ppa/src/land_lad2/vegetation/read_remap_cohort_data.inc
+OBJ = sat_vapor_pres_k.o soil_tile.o vegn_harvesting.o lake_tile.o nfc.o vegetation.o river.o topo_rough.o river_type.o constants.o soil.o sat_vapor_pres.o vegn_tile.o canopy_air.o sphum.o land_model.o vegn_static_override.o lake.o land_tile_io.o monin_obukhov.o platform.o land_data.o transitions.o land_constants.o land_numerics.o atmos_model.o vegn_disturbance.o coupler_main.o vegn_data.o surface_flux.o utilities.o snow_tile.o time_manager.o land_tile_diag_buff.o table_printer.o vegn_cohort_io.o monin_obukhov_kernel.o astronomy.o land_io.o land_utils.o vegn_radiation.o nfu.o glacier.o land_debug.o cana_tile.o nf_utils.o land_tile.o glac_tile.o vegn_cohort.o vegn_dynamics.o flux_exchange.o snow.o uptake.o get_atmos_data.o land_tile_diag_sel.o land_tile_diag.o vegn_photosynthesis.o get_cal_time.o time_interp.o
+OFF = $(SRCROOT)shared/constants/constants.F90 $(SRCROOT)land_lad2/shared/nf_utils/nfc.F90 $(SRCROOT)shared/astronomy/astronomy.F90 $(SRCROOT)land_lad2/land_data.F90 $(SRCROOT)land_lad2/vegetation/vegn_cohort_io.F90 $(SRCROOT)land_lad2/shared/land_tile_diag_buff.F90 $(SRCROOT)land_lad2/shared/land_utils.F90 /Users/eweng/lm3ppa/src/land_lad2/shared/debug.inc /Users/eweng/lm3ppa/src/shared/include/fms_platform.h /Users/eweng/lm3ppa/src/land_lad2/vegetation/vegn_cohort_io.inc $(SRCROOT)land_lad2/glacier/glacier.F90 /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput.inc $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres_k.F90 $(SRCROOT)land_lad2/river/river.F90 $(SRCROOT)land_lad2/shared/land_tile_diag.F90 $(SRCROOT)land_lad2/shared/land_numerics.F90 $(SRCROOT)coupler/surface_flux.F90 $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov_kernel.F90 $(SRCROOT)coupler/flux_exchange.F90 $(SRCROOT)land_lad2/lake/lake.F90 $(SRCROOT)land_lad2/lake/lake_tile.F90 $(SRCROOT)land_lad2/glacier/glac_tile.F90 $(SRCROOT)land_lad2/shared/nf_utils/nfu.F90 $(SRCROOT)land_lad2/vegetation/vegn_disturbance.F90 $(SRCROOT)land_lad2/soil/soil_tile.F90 $(SRCROOT)land_lad2/vegetation/vegn_tile.F90 /Users/eweng/lm3ppa/src/atmos_param/monin_obukhov/monin_obukhov_interfaces.h $(SRCROOT)land_lad2/land_model.F90 $(SRCROOT)coupler/coupler_main.F90 $(SRCROOT)land_lad2/snow/snow.F90 $(SRCROOT)land_lad2/shared/land_io.F90 $(SRCROOT)land_lad2/vegetation/vegn_photosynthesis.F90 $(SRCROOT)land_lad2/snow/snow_tile.F90 $(SRCROOT)land_lad2/shared/sphum.F90 $(SRCROOT)land_lad2/transitions/transitions.F90 $(SRCROOT)atmos_solo_land/atmos_model.F90 $(SRCROOT)shared/utilities/utilities.F90 $(SRCROOT)land_lad2/vegetation/vegn_harvesting.F90 $(SRCROOT)atmos_solo_land/get_atmos_data.F90 /Users/eweng/lm3ppa/src/land_lad2/canopy_air/../shared/debug.inc $(SRCROOT)land_lad2/shared/table_printer.F90 /Users/eweng/lm3ppa/src/land_lad2/vegetation/read_remap_cohort_data.inc $(SRCROOT)land_lad2/canopy_air/cana_tile.F90 $(SRCROOT)land_lad2/vegetation/vegn_data.F90 $(SRCROOT)land_lad2/vegetation/vegn_static_override.F90 $(SRCROOT)land_lad2/land_constants.F90 $(SRCROOT)land_lad2/vegetation/vegn_cohort.F90 $(SRCROOT)shared/time_manager/time_manager.F90 $(SRCROOT)atmos_param/monin_obukhov/monin_obukhov.F90 $(SRCROOT)land_lad2/land_tile.F90 $(SRCROOT)land_lad2/vegetation/vegn_radiation.F90 $(SRCROOT)land_lad2/shared/land_tile_diag_sel.F90 $(SRCROOT)shared/platform/platform.F90 $(SRCROOT)shared/time_manager/get_cal_time.F90 $(SRCROOT)land_lad2/river/river_type.F90 $(SRCROOT)land_lad2/shared/nf_utils/nf_utils.F90 $(SRCROOT)land_lad2/vegetation/vegn_dynamics.F90 /Users/eweng/lm3ppa/src/land_lad2/shared/nf_utils/getput_compressed.inc $(SRCROOT)land_lad2/vegetation/vegetation.F90 $(SRCROOT)land_lad2/canopy_air/canopy_air.F90 $(SRCROOT)land_lad2/shared/land_debug.F90 $(SRCROOT)land_lad2/topo_rough/topo_rough.F90 $(SRCROOT)land_lad2/soil/uptake.F90 $(SRCROOT)land_lad2/shared/land_tile_io.F90 $(SRCROOT)shared/time_interp/time_interp.F90 $(SRCROOT)shared/sat_vapor_pres/sat_vapor_pres.F90 $(SRCROOT)land_lad2/soil/soil.F90
 clean: neat
 	-rm -f .fms.x.cppdefs $(OBJ) fms.x
 neat:

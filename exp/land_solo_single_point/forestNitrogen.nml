@@ -1,0 +1,243 @@
+ &atmos_prescr_nml
+         read_forcing = .true.,
+         gust_to_use  = 'computed',
+         gust_min     = 0.01,
+         atmos_bottom = 35.0,
+         layout = 1,1              /
+
+ &cana_nml
+       turbulence_to_use = "lm3v"
+       init_co2 = 286.0e-6
+       canopy_air_mass_for_tracers = 10.0
+/
+
+ &flux_exchange_nml
+       do_area_weighted_flux = .FALSE.
+/
+
+ &glac_data_nml
+       use_lm2_awc = .true., 
+       rsa_exp_global = 10.,
+       dat_emis_dry = 1., 
+       dat_emis_sat = 1.,
+/
+
+ &glac_nml
+       conserve_glacier_mass = .true.
+       lm2 = .true.
+/
+
+ &harvesting_nml
+       do_harvesting          = .FALSE.
+       grazing_intensity      = 0.25
+       grazing_residue        = 0.1
+       frac_wood_wasted_harv  = 0.25
+       frac_wood_wasted_clear = 0.25
+       !frac_wood_fast         = ONETHIRD
+       !frac_wood_med          = ONETHIRD
+       !frac_wood_slow         = ONETHIRD
+       crop_seed_density      = 0.1
+/
+
+ &lake_data_nml
+       lake_to_use = 'from-rivers'
+       num_l = 20,
+       dz = 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
+            1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
+       dat_emis_dry = 1.,
+       dat_emis_sat = 1.,
+       dat_heat_capacity_ref = 0.,
+       f_iso_liq = 0.02, 0.01
+       f_iso_ice = 0.02, 0.01
+       f_vol_liq = 0.003, 0.
+       f_vol_ice = 0.003, 0.
+       f_geo_liq = 0., 0.
+       f_geo_ice = 0., 0.
+/
+
+ &lake_nml
+       albedo_to_use = 'brdf-params'
+       float_ice_to_top = .true.
+/
+
+ &land_debug_nml
+       watch_point = 0,0,0,1
+/
+
+ &land_model_nml
+       tau_snow_T_adj = 604800.
+       con_fac_small = 0.0
+       con_fac_large = 1.0e2
+       prohibit_negative_leaf_water = .TRUE.
+/
+
+ &landuse_nml
+       do_landuse_change = .false.
+/
+
+ &monin_obukhov_nml
+       stable_option =  2,
+       rich_crit = 10.0,
+       zeta_trans =  0.5
+/
+
+ &sat_vapor_pres_nml
+       construct_table_wrt_liq = .true.
+       construct_table_wrt_liq_and_ice = .true.
+/
+
+ &snow_data_nml
+       emis_snow_max = 1.
+       emis_snow_min = 1.
+       z0_momentum = 0.01
+       num_l = 5
+       dz = 0.05, 0.2, 0.5, 0.2, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0
+       f_iso_cold = 0.90, 0.60
+       f_vol_cold = 0.09, 0.13
+       f_geo_cold = 0.00, 0.00
+       f_iso_warm = 0.90, 0.60
+       f_vol_warm = 0.09, 0.13
+       f_geo_warm = 0.00, 0.00
+       depth_crit = 0.05
+/
+
+ &snow_nml
+       min_snow_mass = 1.e-10
+       max_snow = 1000.
+       albedo_to_use = 'brdf-params'
+/
+
+ &soil_data_nml
+       dat_emis_dry     = 1., 1., 1., 1., 1., 1., 1., 1., 1.
+       dat_emis_sat     = 1., 1., 1., 1., 1., 1., 1., 1., 1.
+       dat_tf_depr      = 2., 2., 2., 2., 2., 2., 2., 2., 2.
+       use_single_geo   = .true.
+       use_geohydrology = .false.
+       gw_scale_soil_depth  = 10.
+       freeze_factor    = 2.0
+       comp             = 1e-4
+       num_l            = 20
+       dz = 0.020, 0.040, 0.040, 0.050, 0.05, 0.100, 0.10, 0.200, 0.200, 0.2, 
+            0.40,  0.40,  0.40,  0.4,   0.4,   1.0,   1.0,  1.0,  1.5,   2.5
+/
+
+ &soil_nml
+       init_w        = 500.
+       uptake_to_use = 'darcy2d-linearized'
+       uptake_oneway = .true.
+       active_layer_drainage_acceleration = 100.
+/
+
+ &static_veg_nml
+         use_static_veg = .FALSE.                
+         timeline   = 'loop'
+         start_loop = 2420, 1, 1, 0, 0, 0
+         end_loop   = 2470, 1, 1, 0, 0, 0
+         fill_land_mask = .TRUE.
+/
+
+ &surface_flux_nml
+       old_dtaudv = .FALSE.
+/
+
+ &topo_rough_nml
+         use_topo_rough    = .true.
+         max_topo_rough    = 100.0 
+         topo_rough_factor = 0.01
+/
+
+ &vegn_data_nml
+       vegn_to_use = 'uniform'
+       internal_gap_frac = 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1
+       K1=10,
+       K2=0.1,
+       K_nitrogen = 0.5
+       fsc_liv=0.9,
+       fsc_wood=0.45,
+       c1(4) = 0.3
+       c2(4) = 0.3
+
+       fact_crit_phen(0:6) = 0., 0., 0., 0., 0.,
+       fact_crit_fire(0:6) = 0., 0., 0., 0., 0.,
+       cnst_crit_phen(0:6) = 0.30, 0.40, 0.30, 0.30, 0.30,
+       cnst_crit_fire(0:6) = 0.15,  0.40, 0.15, 0.15, 0.15,
+       wet_leaf_dreg(0:6)  = .3, .3, .3, .3, .3,
+       ksi =  0, 0, 0, 0, 0,
+       leaf_refl(0:6,1) = 0.10, 0.10, 0.10, 0.10, 0.10, 
+       leaf_refl(0:6,2) = 0.5,  0.5, 0.5, 0.5, 0.5,,
+       dat_root_zeta(0:6) = 0.25813, 0.25813, 0.25813, 0.25813, 0.25813,
+       critical_root_density = 0.0,
+       tau_drip_s     = 259200.0
+       cmc_lai(0:6) = 0.02, 0.02, 0.02, 0.02, 0.02, 
+       csc_lai(0:6) = 0.2,  0.2,  0.2,  0.2,  0.2,  
+       dat_snow_crit = 0.0167, 0.0167, 0.0333, 0.0333, 0.0333 ,
+       t_transp_min = 268.
+!       root_perm = 14*5e-7
+       leaf_age_tau(2) = 150
+       smoke_fraction = 0.9, 0.9, 0.6, 0.6, 0.6, 
+       tg_c3_thresh = 1
+       phen_ev2 = 0.925
+       cmc_eps = 0.01
+
+       do_ppa = .TRUE.
+       l_fract = 0.25,
+!       tau_growth  = 2.5 ! characteristic time of nsc scpending on growth, year
+       wood_fract_min = 0.0
+       understory_lai_factor = 0.25,
+       ! leaf turnover rate
+       alpha(2:6,3) = 5*0.0
+       ! root turnover rate (per year)
+       alpha(2:6,4) = 5*1.2
+       gamma_resp = 0.035, 0.035, 0.035, 0.035, 0.035,
+       beta (2:6,2) = 5*0.001
+       beta (2:6,4) = 5*1.25  ! 2.866
+       ! species      0         1         2         3         4
+       lifeform     =  0,        0,       1,       1,        1,
+       pt           =  1,       1,       0,       0,        0,    ! 0: C3; 1: C4
+       Vmax         = 30.0E-6, 30.0E-6, 30.0E-6, 22.0E-6, 25.0E-6, 
+       m_cond       = 4.,       2.,      7.,     7.,      7.,
+       alpha_phot   = 0.05, 0.025, 0.06, 0.06, 0.06,
+       alphaHT      = 36.01,    36.01,    36.01,    36.41,    36.41,
+       alphaCA      = 140,      140,      140,      150,      150,
+       alphaCSASW   = 0.14,     0.14,     0.14,     0.14,     0.14,
+       thetaCA      = 1.5,      1.5,      1.5,      1.5,       1.5
+       thetaCSASW   = 1.5,      1.5,      1.5,      1.5,       1.5
+       tauNSC       = 2.5,      2.5,      2.5,      2.5,      2.5
+       laimax       = 3.0,      3.0,      3.0,      3.8,      3.5,
+       LMA          = 0.0445,   0.0445,   0.0445,   0.035,    0.038,
+       phiRL        = 0.8,      0.8,      0.8,      0.8,      0.8
+       maturalage   = 0,        0,        5.0,      5.0,      5.0,
+       seedlingsize = 0.01,     0.01,     0.01,      0.2,      0.2,
+       prob_g       = 0.45,     0.45,     0.45,     0.45,     0.45,
+       prob_e       = 0.6,      0.6,      0.6,      0.6,      0.6,
+       mortrate_d_c = 0.02,     0.02,     0.02,    0.012,    0.020,
+       mortrate_d_u = 0.04,     0.04,     0.08,    0.049,    0.081,
+       rho_wood     = 230,      230,      230,      265,      255,
+       taperfactor  = 0.65,     0.65,     0.65,     0.65,     0.65,
+       srl          = 43.9e3,   43.9e3,   43.9e3,   43.9e3,   43.9e3, ! m/kgC, to get desired SRA
+       root_r       = 1.2e-4,   1.2e-4,   1.2e-4,   1.2e-4,   1.2e-4, ! m
+       root_perm    = 2.5e-7,   2.5e-7,   2.5e-7,   2.5e-7,   2.5e-7,    
+ / 
+
+ &vegn_nml
+       init_n_cohorts =1,            !  5
+       init_cohort_species = 2,    ! 3,    4, 
+       init_cohort_nindivs = 0.5,! 0.005,0.007,
+       init_cohort_bsw     = 0.2,  ! 1.5,
+       init_cohort_bwood   = 0.0,  ! 0.0,
+       init_cohort_nsc     = 2.0,  ! 2.0,
+       QNmineral= 0.015, ! kg N m-2
+       N_input  = 0.002, ! kg N m-2 yr-1
+       rad_to_use = 'two-stream',
+       photosynthesis_to_use = 'leuning',
+       snow_rad_to_use = 'paint-leaves',
+       write_soil_carbon_restart = .FALSE.,
+       co2_to_use_for_photosynthesis ='prescribed',  !'interactive'
+       co2_for_photosynthesis = 350.0e-6,
+       do_cohort_dynamics   = .TRUE.,              
+       do_patch_disturbance = .FALSE.,              
+       do_phenology         = .TRUE.,              
+       do_biogeography      = .FALSE.,              
+       do_seed_transport    = .TRUE.,
+       tau_smooth_ncm = 22.0
+ /

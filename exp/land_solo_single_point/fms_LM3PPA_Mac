@@ -1,0 +1,117 @@
+#!/bin/csh -f
+#Minimal runscript for solo land single point model
+set echo
+#--------------------------------------------------------------------------------------------------------
+# define variables
+#set template  = $cwd/../../bin/mkmf.template.intel  # path to compile template
+#set mkmf      = $cwd/../../bin/mkmf                 # path to executable mkmf
+#set sourcedir = $cwd/../../src                      # path to directory containing model source code
+
+# define variables
+set sitename = "OKR" # "CA-Man" # "OKR" # "HFR"
+set template  = /Users/eweng/lm3ppa/bin/mkmf.template.Mac    # path to compile template
+set mkmf      = /Users/eweng/lm3ppa/bin/mkmf                 # path to executable mkmf
+set sourcedir = /Users/eweng/lm3ppa/src                      # path to directory containing model source code
+
+#--------------------------------------------------------------------------------------------------------
+set execdir = /Users/eweng/lm3ppa/exec         # where code is compiled and executable is created
+set workdir = /Users/eweng/LM3_RUNS/DE-${sitename}       # 2014-10-21, Ensheng
+
+#source /opt/modules/3.2.6.5/init/csh
+#module use -a /ncrc/home2/fms/local/modulefiles
+#module unload PrgEnv-cray PrgEnv-pgi PrgEnv-pathscale PrgEnv-gnu PrgEnv-intel
+#module unload fre netcdf
+#module load fre/arkansas-10
+#module rm PrgEnv-pgi
+#module load PrgEnv-intel/3.1.29
+#module load intel/11.1.073
+#module list
+setenv MAIN_PROGRAM coupler_main.o
+
+set pathnames = /Users/eweng/lm3ppa/exp/land_solo_single_point/path_names  # path to file containing list of source paths
+set namelist  = /Users/eweng/lm3ppa/exp/land_solo_single_point/DEsuccession.nml   # path to namelist file, namelists3
+
+#--------------------------------------------------------------------------------------------------------
+# setup directory structure
+if ( ! -d $execdir ) mkdir $execdir
+if ( ! -d $workdir ) mkdir $workdir $workdir/INPUT $workdir/RESTART $workdir/DIAGNOSTICS
+
+#--------------------------------------------------------------------------------------------------------
+# compile the model code and create executable
+cd $execdir
+$mkmf -p fms.x -t $template -a $sourcedir $pathnames $sourcedir/shared/include
+#$mkmf -t $template -p fms.x -c
+if ( $status != 0 ) then
+  echo "ERROR: mkmf failed"
+  exit 1
+endif
+make -f Makefile
+if ( $status != 0 ) then
+  echo "ERROR: make failed"
+  exit 1
+endif
+#--------------------------------------------------------------------------------------------------------
+# get input data for Sheffield driver for years ys-ye, set up file.table
+set ys                 = 1949
+set ye                 = 2008
+#set land_forcing_dir   = "/Users/eweng/Sheffield/HFR"
+set land_forcing_dir   = "/Users/eweng/Sheffield/${sitename}"  #CA-Man
+set land_forcing_files = ""
+set year               = $ys
+while ( $year <= $ye )
+#   set land_forcing_files = "$land_forcing_files ${land_forcing_dir}/HFR_${year}.nc"
+   set land_forcing_files = "$land_forcing_files ${land_forcing_dir}/${sitename}_${year}.nc"
+
+   @ year ++
+   end
+#mkdir $workdir/FORCING
+if ( ! -d $workdir/FORCING ) mkdir $workdir/FORCING
+cp $land_forcing_files $workdir/FORCING/ || exit 1
+
+#form the file.table for the input atmospheric forcing
+ls -1 $workdir/FORCING/*.nc > $workdir/file.table
+
+# increase "ye" by 1 to prepare for using it in the prescr_forcing_nml end of loop
+@ ye ++
+#--------------------------------------------------------------------------------------------------------
+# set run length, calendar and time steps
+cd $workdir
+cat > input.nml <<EOF
+ &coupler_nml
+     months =9600,
+     days   = 0,
+     seconds = 0,
+     current_date = 1949,01,01,0,0,0,
+     calendar = 'JULIAN'
+     dt_atmos = 3600,
+     dt_cpld  = 43200 /
+
+ &prescr_forcing_nml
+     use_diurnal_solar = .true.,
+     filelist = 'file.table'
+     timeline = 'loop',
+     start_loop = $ys,1,1,0,0,0,
+     end_loop   = $ye,1,1,0,0,0,
+     limit_swdn_by_TOA_flux = .true. /
+EOF
+cat $namelist >> input.nml
+cp $execdir/fms.x fms${sitename}
+
+##--------------------------------------------------------------------------------------------------------
+## get input data and executable
+#cp /lustre/fs/archive/fms/esm/LM3/netcdf/any_grid/geohydrology_table.20090108.nc     $workdir/INPUT/geohydrology_table.nc
+#cp /lustre/fs/scratch/Peter.Phillipps/lu.1700-2005/lu.1700-2005.nc                   $workdir/INPUT/lu.1700-2005.nc
+
+##cp /archive/kap/lmdt/mod_input_files/netcdf/any_grid/geohydrology_table.20090108.nc $workdir/INPUT/geohydrology_table.nc
+##cp /archive/slm/DATA/landuse/hyde3/rc2/lu.1700-2005.nc                              $workdir/INPUT/lu.1700-2005.nc
+
+#--------------------------------------------------------------------------------------------------------
+## get restart data (not needed if one desires a cold start)
+#cd $workdir/INPUT
+#cpio -i <  /ncrc/home1/Peter.Phillipps/non_fms_model/initCond/21830101.cpio
+##--------------------------------------------------------------------------------------------------------
+# run the model
+#cd $workdir
+ulimit -n 10240
+#./fms.x
+#--------------------------------------------------------------------------------------------------------

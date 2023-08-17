@@ -1,0 +1,772 @@
+module atmos_model_mod
+
+  use utilities_mod,      only: logunit, get_unit, num_atmos_tracers, atmos_tracer_names, error_mesg, FATAL, WARNING, &
+                                atmos_tracer_longnames, atmos_tracer_units, check_nml_error
+
+  use time_manager_mod,   only: time_type, operator(+), operator(*), &
+       get_time, print_time, print_date, get_date
+
+  use prescr_forcing_mod, only: prescr_forcing_type, prescr_forcing_init, &
+       prescr_forcing_end, get_prescr_forcing
+
+  use astronomy_mod,      only: astronomy_init, diurnal_solar
+
+  use constants_mod,      only: PI,grav,radius
+  use      constants_mod, only: rdgas, rvgas, cp_air, stefan, WTMAIR, WTMCO2
+
+implicit none
+include 'netcdf.inc'
+private
+
+
+! ==== public interfaces =====================================================
+public :: &
+     atmos_model_init,        &  ! initialize atmosphere state
+     atmos_model_end,         &  ! finish up atmosphere
+     update_atmos_model_down, &  ! downward sweep of update
+     update_atmos_model_up       ! upward sweep of update
+
+!public :: atm_stock_pe
+public :: surf_diff_type
+public :: atmos_data_type
+public :: land_ice_atmos_boundary_type
+public :: atmos_model_restart
+! ==== end of public interfaces ==============================================
+
+type :: surf_diff_type
+  real, pointer, dimension(:,:) :: &
+       dtmass  => NULL(),   & ! dt/mass where dt = atmospheric time step ((i+1) 
+                              ! = (i-1) for leapfrog) (s); mass = mass per unit 
+                              ! area of lowest atmosphehic layer  (Kg/m2))
+       dflux_t => NULL(),   & ! derivative of implicit part of downward tempera-
+                              ! ture flux at top of lowest atmospheric layer w.r.t. 
+                              ! temperature of lowest atmospheric layer (Kg/(m2 s))
+       delta_t => NULL(),   & ! increment ((i+1) = (i-1) for leapfrog) in tempe-
+                              ! rature of lowest atmospheric layer (K)
+       delta_u => NULL(),   &
+       delta_v => NULL(),   &
+       sst_miz => NULL()
+  real, pointer, dimension(:,:,:) :: &
+       dflux_tr => NULL(),  & ! derivative of implicit part of downward tracer
+                              ! flux at top of lowest atmospheric layer w.r.t.
+                              ! tracer concentration at the lowest atmospheric 
+                              ! layer (Kg/(m2 s))
+       delta_tr => NULL()     ! increment ((i+1) = (i-1) for leapfrog) in tracer 
+                              ! concentration lowest atmospheric layer ([tr])
+
+end type surf_diff_type
+
+! fields that are passed from the atmosphere to land and ice
+type :: atmos_data_type
+  !type(domain2d) :: domain 
+   integer        :: axes(4)
+   real, pointer, dimension(:,:) ::  &
+        t_bot     => NULL(), &   ! temperature at the atm. bottom, degK
+        z_bot     => NULL(), &   ! altitude of the atm. bottom above sfc., m
+        p_bot     => NULL(), &   ! pressure at the atm. bottom, N/m2
+        u_bot     => NULL(), &   ! zonal wind at the atm. bottom, m/s
+        v_bot     => NULL(), &   ! merid. wind at the atm. bottom, m/s
+        p_surf    => NULL(), &   ! surface pressure, N/m2
+        slp       => NULL(), &   ! sea level pressure, N/m2
+        gust      => NULL(), &   ! gustiness, m/s
+        coszen    => NULL(), &   ! cosine of zenith angle
+        flux_sw   => NULL(), &   ! SW radiation flux (net), W/m2
+        flux_lw   => NULL(), &   ! LW radiation flux (down), W/m2
+        flux_sw_dir => NULL(),&
+        flux_sw_dif => NULL(),&
+        flux_sw_down_vis_dir   => NULL(), &
+        flux_sw_down_vis_dif   => NULL(), &
+        flux_sw_down_total_dir => NULL(), &
+        flux_sw_down_total_dif => NULL(), &
+        flux_sw_vis            => NULL(), &
+        flux_sw_vis_dir        => NULL(), &
+        flux_sw_vis_dif        => NULL(), &
+        lprec     => NULL(), &   ! liquid precipitation, kg/m2/s
+        fprec     => NULL()      ! frozen precipitation, kg/m2/s
+   real, pointer, dimension(:,:,:) :: &
+        tr_bot => NULL()
+   logical, pointer, dimension(:,:) :: maskmap =>NULL()! A pointer to an array indicating which
+                                                       ! logical processors are actually used for
+                                                       ! the ocean code. The other logical
+                                                       ! processors would be all land points and
+                                                       ! are not assigned to actual processors.
+                                                       ! This need not be assigned if all logical
+                                                       ! processors are used. This variable is dummy and need 
+                                                       ! not to be set, but it is needed to pass compilation.    
+   type(surf_diff_type) :: Surf_diff
+   type(time_type) :: &
+        Time,      &   ! current time
+        Time_step, &   ! time step for atmos calc 
+        Time_init      ! initial time (?)
+   integer, pointer  :: pelist(:) => NULL()
+   logical           :: pe
+
+   type(prescr_forcing_type) :: Forcing ! data for prescribed forcing
+end type atmos_data_type
+
+type :: land_ice_atmos_boundary_type
+!variables of this type are declared by coupler_main, allocated by flux_exchange_init
+!quantities going from land+ice to atmos
+!       t         = surface temperature for radiation calculations
+!       albedo    = surface albedo for radiation calculations
+!       land_frac = fraction amount of land in a grid box
+!       dt_t      = temperature tendency at the lowest level
+!       dt_q      = specific humidity tendency at the lowest level
+!       u_flux    = zonal wind stress
+!       v_flux    = meridional wind stress
+!       dtaudu    = derivative of wind stress w.r.t. the lowest level wind speed
+!       dtaudv    = derivative of wind stress w.r.t. the lowest level wind speed
+!       u_star    = friction velocity
+!       b_star    = bouyancy scale
+!       q_star    = moisture scale
+!       rough_mom = surface roughness (used for momentum
+   real, dimension(:,:), pointer :: &
+        t =>NULL(), &
+        albedo =>NULL(), &
+        albedo_vis_dir =>NULL(), &
+        albedo_nir_dir =>NULL(), &
+        albedo_vis_dif =>NULL(), &
+        albedo_nir_dif =>NULL(), &
+        land_frac =>NULL()
+   real, dimension(:,:), pointer :: &
+        dt_t =>NULL()
+   real, dimension(:,:,:), pointer :: &
+        dt_tr  =>NULL()
+   real, dimension(:,:), pointer :: &
+        u_flux =>NULL(), &
+        v_flux =>NULL(), &
+        dtaudu =>NULL(), &
+        dtaudv =>NULL(), &
+        u_star =>NULL(), &
+        b_star =>NULL(), &
+        q_star =>NULL(), &
+        rough_mom =>NULL()
+   real, dimension(:,:,:), pointer :: &
+        data =>NULL() !collective field for "named" fields above
+   integer :: xtype             !REGRID, REDIST or DIRECT
+end type land_ice_atmos_boundary_type
+
+
+
+! ---- module constants ------------------------------------------------------
+character(len=128) :: version  = '$Id: atmos_model.F90,v 1.1.2.1.2.12 2012/06/19 18:34:53 pjp Exp $'
+character(len=128) :: tagname  = '$Name: no_fms_b_pjp $'
+character(len=*),parameter :: mod_name = 'atmos_pr'
+
+! ---- module variables ------------------------------------------------------
+logical :: atmos_model_initialized = .false.
+logical :: stock_warning_issued = .false.
+logical :: fexist
+real, allocatable :: lat(:,:), lon(:,:)
+integer :: isphum ! index of specific humidity in tracer table
+integer :: ico2   ! index of CO2 in the tracer table
+real, allocatable :: area (:,:)  ! surface area
+real              :: global_area ! total sum of area
+
+! ---- namelist --------------------------------------------------------------
+integer :: layout(2)    = (/0,0/)
+real    :: gustiness    = 5.0  ! m/s, wind gustiness
+real    :: atmos_bottom = 50.  ! m, altitude of the botom of the atmos above surface
+logical :: read_forcing= .false.   ! logical, true if reading forcing data
+                             !  (shortwave down, longwave down, surface pressure,
+                             !   air temperature, dew-point temperature, wind,
+                             !   precipitation)
+character(len=24) :: gust_to_use = 'computed' ! or 'prescribed'
+real    :: gust_min      = 0.0 ! minimum gustiness
+real    :: co2_dvmr      = 286.0533e-6 ! dry volumetric CO2 mixing ratio in the atmosphere
+namelist /atmos_prescr_nml/ layout, gustiness, atmos_bottom, read_forcing, &
+     gust_to_use, gust_min, co2_dvmr
+
+! ---- diagnostic field IDs --------------------------------------------------
+integer :: id_swdn, id_sw, id_lw, id_ps, id_t, id_z, id_q, id_u, id_v
+integer :: id_swdn_vis_dir, id_swdn_vis_dif, id_swdn_total_dir, id_swdn_total_dif
+integer :: id_fprec, id_lprec
+integer :: id_swdn_inst, id_cosz_inst, id_fracday_inst
+integer :: id_swdn_ave, id_cosz_ave, id_fracday_ave
+integer, allocatable :: id_tr_bot(:)
+
+contains
+
+! ============================================================================
+subroutine atmos_model_init(Atmos, Time_init, Time, Time_step)
+! initializes state of the "atmosphere"
+  type(atmos_data_type), intent(inout) :: &
+       Atmos   ! data to initialize
+  type(time_type), intent(in) :: &
+       Time_init, &
+       Time,      &
+       Time_step      ! atmospheric time step
+
+  ! ---- local vars
+  integer :: io    ! i/o status
+  integer :: nml_unit ! i/o unit for namelist file
+  integer :: res_unit ! i/o unit for restart file
+  integer :: ntiles! number of mosaic tiles 
+  integer :: mlon  ! lon size of global grid
+  integer :: mlat  ! lat size of global grid
+  integer :: is,ie,js,je ! domain boundaries
+  integer :: tile  ! number of current tile
+  integer :: i, j, tr
+  integer :: ntrace, ntprog, ntdiag, ntfamily
+  real, allocatable :: glon(:,:), glat(:,:) ! longitudes and latitudes of the grid cells
+  real, allocatable :: garea(:,:) ! grid cell areas
+
+  character(len=32) :: name ! tracer name
+
+  ! set up atmospheric model time
+  Atmos%Time_init = Time_init
+  Atmos%Time      = Time
+  Atmos%Time_step = Time_step
+
+  ! read namelist
+  nml_unit = get_unit()
+  open(nml_unit, file='input.nml', form='formatted', action='read', status='old')
+  do 
+     read (nml_unit, nml=atmos_prescr_nml, iostat=io, end=10)
+     if (check_nml_error (io, 'atmos_prescr_nml')==0) exit ! from loop
+  enddo
+10   close (nml_unit)
+
+  ! write version number and namelist to the log file
+  write ( logunit, nml=atmos_prescr_nml)
+
+  ! define the processor layout information according to the global grid size 
+  ntiles=1; mlon=1; mlat=1
+  layout = (/1,1/)
+
+  is=1; ie=1; js=1; je=1
+
+  ntrace = num_atmos_tracers
+  ntprog = num_atmos_tracers
+  ntdiag = 0
+  ntfamily = 0
+  do tr=1,num_atmos_tracers
+    if(trim(atmos_tracer_names(tr)) == 'sphum') isphum = tr
+    if(trim(atmos_tracer_names(tr)) == 'co2'  ) ico2   = tr
+  enddo
+
+  ! allocate data
+  allocate ( &
+       Atmos%t_bot                  (is:ie,js:je), &
+       Atmos%tr_bot                 (is:ie,js:je,ntprog), &
+       Atmos%z_bot                  (is:ie,js:je), &
+       Atmos%p_bot                  (is:ie,js:je), &
+       Atmos%u_bot                  (is:ie,js:je), &
+       Atmos%v_bot                  (is:ie,js:je), &
+       Atmos%p_surf                 (is:ie,js:je), &
+       Atmos%slp                    (is:ie,js:je), &
+       Atmos%gust                   (is:ie,js:je), &
+       Atmos%flux_sw                (is:ie,js:je), &
+       Atmos%flux_sw_dir            (is:ie,js:je), &
+       Atmos%flux_sw_dif            (is:ie,js:je), &
+       Atmos%flux_sw_down_vis_dir   (is:ie,js:je), &
+       Atmos%flux_sw_down_vis_dif   (is:ie,js:je), &
+       Atmos%flux_sw_down_total_dir (is:ie,js:je), &
+       Atmos%flux_sw_down_total_dif (is:ie,js:je), &
+       Atmos%flux_sw_vis            (is:ie,js:je), &
+       Atmos%flux_sw_vis_dir        (is:ie,js:je), &
+       Atmos%flux_sw_vis_dif        (is:ie,js:je), &
+       Atmos%flux_lw                (is:ie,js:je), &
+       Atmos%coszen                 (is:ie,js:je), &
+       Atmos%lprec                  (is:ie,js:je), &
+       Atmos%fprec                  (is:ie,js:je), &
+       Atmos%Surf_diff%dtmass       (is:ie,js:je), &
+       Atmos%Surf_diff%dflux_t      (is:ie,js:je), & 
+       Atmos%Surf_diff%dflux_tr     (is:ie,js:je,ntprog), &
+       Atmos%Surf_diff%delta_t      (is:ie,js:je), &
+       Atmos%Surf_diff%delta_tr     (is:ie,js:je,ntprog),   &
+       Atmos%Surf_diff%delta_u      (is:ie,js:je), &
+       Atmos%Surf_diff%delta_v      (is:ie,js:je), &
+       glon(mlon,mlat), glat(mlon,mlat), garea(mlon,mlat), &
+       lon(is:ie, js:je), lat(is:ie,js:je), area(is:ie,js:je))
+  allocate(id_tr_bot(ntprog))
+
+  tile = 1
+
+  ! set up arrays of logitudes and latitudes
+  glon(:,:) = 299.
+  glat(:,:) = -2.
+  lon(:,:) = glon(is:ie,js:je)*PI/180.
+  lat(:,:) = glat(is:ie,js:je)*PI/180.
+
+  ! calculate area and global area
+  garea(is:ie,js:je) = 12356622870.365906
+  area(:,:) = garea(is:ie,js:je)
+  global_area = garea(mlon,mlat)
+
+  ! get initial state
+  ! set up initial values for the "atmospheric" variables
+  do i = is,ie
+     Atmos%t_bot (i,:) = 220.0 + 80.*cos(2*PI/180.)
+  enddo
+
+  ! initialize tracer fields
+  Atmos%tr_bot(:,:,:) = 0.0
+
+  Atmos%u_bot = 1.0            ! m/s
+  Atmos%v_bot = 0.0            ! m/s
+  Atmos%gust  = gustiness      ! m/s     
+  Atmos%flux_sw_dir = 0
+  Atmos%flux_sw_dif = 0
+  Atmos%flux_sw_down_vis_dir = 0
+  Atmos%flux_sw_down_vis_dif = 0
+  Atmos%flux_sw_down_total_dir = 0
+  Atmos%flux_sw_down_total_dif = 0
+  Atmos%flux_sw_vis = 0
+  Atmos%flux_sw_vis_dir = 0
+  Atmos%flux_sw_vis_dif = 0
+  Atmos%flux_lw = 0.0          ! W/m2 ; downward
+  Atmos%coszen = 0.0           ! sun in zenith everywhere
+  Atmos%lprec  = 0.0           ! kg/m2/s
+  Atmos%fprec  = 0.0           ! kg/m2/s
+
+  
+  Atmos%Surf_diff%dtmass  = 0  !
+  Atmos%Surf_diff%dflux_t = 0  ! 
+  Atmos%Surf_diff%dflux_tr = 0 !
+  Atmos%Surf_diff%delta_t = 0  !
+  Atmos%Surf_diff%delta_tr = 0 !
+  Atmos%Surf_diff%delta_u = 0  !
+  Atmos%Surf_diff%delta_v = 0  !
+
+  Atmos%p_surf = 1e5             ! N/m2
+  Atmos%slp   = Atmos%p_surf
+  Atmos%z_bot = atmos_bottom     ! m 
+  Atmos%p_bot = Atmos%p_surf*exp(-Atmos%z_bot/6000)   ! N/m2
+  
+  ! initialize diagnostic fields
+  call init_diag ( Atmos, Time )
+  
+  !  initialize astronomy module
+  call astronomy_init
+
+  ! read prescribed forcing if so specified by namelist
+  
+  if (read_forcing) then
+     ! initialize prescribed data 
+     call prescr_forcing_init ( Atmos%Forcing, glon*PI/180.0, glat*PI/180.0, Time, Time_step )
+
+     ! get the initial prescribed data for the atmosphere
+     call get_atmos_data ( Atmos )
+     ! NOTE: at this point the shortwave flux is _downward_ -- net is calculated
+     ! in "update_atmos_model_down". It cannot be done here because we do not 
+     ! know albedo.
+  endif
+
+  ! read restart file
+  inquire (file='INPUT/atmos_prescr.res', exist=fexist)
+  if ( fexist ) then
+     res_unit = get_unit()
+     open(res_unit, file='INPUT/atmos_prescr.res', form='unformatted', action='read')
+     rewind res_unit
+     do tr = 1,size(Atmos%tr_bot,3)
+        read ( res_unit ) Atmos%tr_bot(:,:,tr)
+        read ( res_unit ) Atmos%Surf_diff%delta_tr(:,:,tr)
+     enddo
+     read ( res_unit ) Atmos%Surf_diff%delta_t
+     ! NOTE: we could have calculated delta_t and delta_q without restart file,
+     ! e.g. by getting data for one time step back and then getting data for the
+     ! current time. However, this would result in problems for the beginning
+     ! of integration, when prescribed data for previous time step are not
+     ! available. This could be handled somehow, of course, but restart file 
+     ! approach seems to be more straightforward.
+     read ( res_unit ) Atmos%gust
+     if(gust_to_use=='computed') then
+        Atmos%gust = max(Atmos%gust,gust_min)
+     endif
+     close ( res_unit )
+  else
+     Atmos%tr_bot(:,:,isphum) = 0.0029127574525773525
+     Atmos%Surf_diff%delta_t = 0.0
+     Atmos%gust = 5.0
+  endif
+
+  deallocate(glon,glat,garea)
+
+  atmos_model_initialized = .true.
+
+end subroutine atmos_model_init
+
+
+
+! ============================================================================
+subroutine atmos_model_end ( Atmos )
+! terminates atmospheric model
+  type(atmos_data_type), intent(inout) :: Atmos
+
+  call atmos_model_restart( Atmos, '' )
+
+  ! finish up forcing data
+  if (read_forcing) call prescr_forcing_end ( Atmos%Forcing )
+  ! deallocate the data
+  deallocate ( &
+       Atmos%t_bot      , &
+       Atmos%tr_bot     , &
+       Atmos%z_bot      , &
+       Atmos%p_bot      , &
+       Atmos%u_bot      , &
+       Atmos%v_bot      , &
+       Atmos%p_surf     , &
+       Atmos%slp        , &
+       Atmos%gust       , &
+       Atmos%flux_sw    , &
+       Atmos%flux_sw_dir  , &
+       Atmos%flux_sw_dif  , &
+       Atmos%flux_sw_down_vis_dir  , &
+       Atmos%flux_sw_down_vis_dif  , &
+       Atmos%flux_sw_down_total_dir  , &
+       Atmos%flux_sw_down_total_dif  , &
+       Atmos%flux_sw_vis    , &
+       Atmos%flux_sw_vis_dir, &
+       Atmos%flux_sw_vis_dif, &
+       Atmos%flux_lw    , &
+       Atmos%coszen     , &
+       Atmos%lprec      , &
+       Atmos%fprec      , &
+       Atmos%Surf_diff%dtmass,    &
+       Atmos%Surf_diff%dflux_t,   & 
+       Atmos%Surf_diff%dflux_tr,  &
+       Atmos%Surf_diff%delta_t,   &
+       Atmos%Surf_diff%delta_tr,  &
+       Atmos%Surf_diff%delta_u,   &
+       Atmos%Surf_diff%delta_v,   &
+       lon, lat, area             )
+  deallocate(id_tr_bot)
+
+  atmos_model_initialized = .false.
+end subroutine atmos_model_end
+
+
+! ============================================================================
+! write restart file
+subroutine atmos_model_restart(Atmos, timestamp)
+  type (atmos_data_type), intent(inout) :: Atmos
+  character(len=*),       intent(in)    :: timestamp
+
+  ! ---- local vars
+  character(32)  :: name ! tracer name
+  integer :: tr ! tracer number
+  integer :: res_unit
+
+  res_unit = get_unit()
+  open(res_unit, file='RESTART/atmos_prescr.res', form='unformatted', action='write') 
+  do tr = 1,size(Atmos%tr_bot,3)
+     name = atmos_tracer_names(tr)
+     write ( res_unit ) Atmos%tr_bot(:,:,tr)
+     write ( res_unit ) Atmos%Surf_diff%delta_tr(:,:,tr)
+  enddo
+  write ( res_unit ) Atmos%Surf_diff%delta_t
+  write ( res_unit ) Atmos%gust
+  close ( res_unit )
+end subroutine atmos_model_restart
+
+
+! ============================================================================
+subroutine update_atmos_model_down ( Sfc, Atmos )
+! performs radiation, damping, and vertical diffusion of momentum,
+! tracers, and downward heat/moisture
+
+  type(land_ice_atmos_boundary_type), intent(inout) :: Sfc   ! surface boundary
+  type(atmos_data_type)             , intent(inout) :: Atmos ! atmosphere state
+
+  integer :: dt ! atmospheric time step (seconds)
+  integer :: tr ! tracer number
+
+  ! calculate net shortwave fluxes from downward shortwave fluxes and surface albedos
+  atmos%flux_sw_vis_dir = &
+       atmos%flux_sw_down_vis_dir*(1-sfc%albedo_vis_dir)
+  atmos%flux_sw_vis_dif = &
+       atmos%flux_sw_down_vis_dif*(1-sfc%albedo_vis_dif)
+  atmos%flux_sw_vis = &
+       atmos%flux_sw_down_vis_dir + atmos%flux_sw_down_vis_dif
+  atmos%flux_sw_dir = &
+       atmos%flux_sw_vis_dir + &
+       (atmos%flux_sw_down_total_dir-atmos%flux_sw_down_vis_dir) &
+       *(1-sfc%albedo_nir_dir)
+  atmos%flux_sw_dif = &
+       atmos%flux_sw_vis_dif + &
+       (atmos%flux_sw_down_total_dif-atmos%flux_sw_down_vis_dif) &
+       *(1-sfc%albedo_nir_dif)
+  atmos%flux_sw = atmos%flux_sw_dir + atmos%flux_sw_dif
+
+  if (trim(gust_to_use)=='computed') then
+     !compute gust based on u_star and b_star
+     where (Sfc%b_star > 0.)
+        Atmos%gust = (Sfc%u_star*Sfc%b_star*1000)**(1./3.)
+     elsewhere
+        Atmos%gust = 0.0
+     endwhere
+     Atmos%gust = max(Atmos%gust, gust_min)
+  else if (trim(gust_to_use)=='prescribed') then
+     Atmos%gust = gustiness
+  else
+     call error_mesg('update_atmos_down','illegal value of gust_to_use '//&
+          trim(gust_to_use),FATAL)
+  end if
+
+  ! set up bottom parameters
+  call get_time(Atmos%Time_step, dt)
+  Atmos%Surf_diff%dtmass = real(dt)*grav/Atmos%p_surf
+
+  ! zero out tracer tendencies at the surface to avoid dealing with uninitialized 
+  ! values in update_atmos_up: in principle one should figure out which tracers are
+  ! exchanged with surface and just do not use the rest, but in this driver it is
+  ! simpler to clear all the tendencies and do not distinguish between exchanged
+  ! and non-exchanged tracers
+  Sfc%dt_tr = 0.0
+
+end subroutine update_atmos_model_down
+
+! ============================================================================
+subroutine update_atmos_model_up ( sfc, Atmos )
+!    performs upward vertical diffusion of heat/moisture and
+!    moisture processes
+  type(land_ice_atmos_boundary_type), intent(in)    :: sfc   ! sfc boundary conditions
+  type(atmos_data_type)             , intent(inout) :: Atmos ! atmosphere to update
+
+  integer :: tr ! tracer number
+  real    :: global_atm_mass ! global atm mass
+
+  Atmos%Time = Atmos%Time + Atmos%Time_step
+
+  ! increment tracers
+  do tr = 1,size(Atmos%tr_bot,3)
+     ! update of specific humidity is skipped because it's not a prognostic 
+     ! variable in this configuration: its value is overriden every time step 
+     ! from the data
+     if(tr==isphum) cycle
+     ! increment tracer
+     Atmos%tr_bot(:,:,tr) = Atmos%tr_bot(:,:,tr) + sfc%dt_tr(:,:,tr)
+  enddo
+  
+  call diag_fast ( Atmos, Atmos%Time )
+  
+  ! get atmospheric data for the next time step
+  call get_atmos_data ( Atmos )
+  ! NOTE: at this point the shortwave flux is _downward_ -- net is calculated
+  ! in "update_atmos_model_down". It cannot be done here because in this case
+  ! SW net would not be defined on the first time step.
+
+end subroutine update_atmos_model_up
+
+
+! ============================================================================
+subroutine get_atmos_data ( Atmos )
+! sets atmospheric data for the specified time
+  type(atmos_data_type), intent(inout) :: Atmos
+
+  ! ---- local vars 
+  real    :: rrsun
+  real    :: fracday(size(Atmos%coszen,1),size(Atmos%coszen,2)) 
+
+  call diurnal_solar ( lat, lon, Atmos%Time, Atmos%coszen, fracday, rrsun, Atmos%time_step)
+  call get_prescr_forcing ( &
+       Atmos%Forcing, Atmos%Time,      &
+       Atmos%flux_sw_down_vis_dir, & 
+       Atmos%flux_sw_down_vis_dif, & 
+       Atmos%flux_sw_down_total_dir, & 
+       Atmos%flux_sw_down_total_dif, & 
+       Atmos%flux_lw, & ! out
+       Atmos%p_surf, &
+       Atmos%t_bot,  &
+       Atmos%tr_bot(:,:,isphum),  &
+       Atmos%u_bot, Atmos%v_bot, &
+       Atmos%lprec, Atmos%fprec &
+       )
+  Atmos%tr_bot(:,:,ico2) =  co2_dvmr * (WTMCO2/WTMAIR) * (1.0 - Atmos%tr_bot(:,:,isphum))
+  
+!  compute delta_t and delta_q (new timestep - old timestep)
+  Atmos%Surf_diff%delta_t = 0
+  Atmos%Surf_diff%delta_tr = 0
+
+  Atmos%p_bot  = Atmos%p_surf*exp(-Atmos%z_bot/6000)   ! N/m2
+  Atmos%slp    = Atmos%p_surf
+  
+end subroutine get_atmos_data
+
+
+
+! ============================================================================
+subroutine init_diag ( Atmos, Time )
+! initailaize diagnostics for prescribed forcing
+  type(atmos_data_type), intent(inout) :: Atmos ! our data
+  type(time_type), intent(in) :: Time    ! current time
+
+  ! ---- local vars ----------------------------------------------------------
+  real    :: rad2deg          ! radian->degree conversion factor
+  integer :: mlon, mlat       ! size of global grid
+  integer :: tr               ! tracer number
+  character(32) :: name       ! name of the tracer
+  integer :: i
+
+  mlon = 1
+  mlat = 1
+  rad2deg = 180.0/PI
+
+  ! register diagnostic fields
+  id_swdn = get_unit()
+  open(unit=id_swdn, file='DIAGNOSTICS/'//mod_name//'_swdn', form='formatted', action='write', position='rewind')
+  write(id_swdn,'(a)') 'units = W/m2'
+
+  id_swdn_vis_dir = get_unit()
+  open(unit=id_swdn_vis_dir, file='DIAGNOSTICS/'//mod_name//'_swdn_vis_dir', form='formatted', action='write', position='rewind')
+  write(id_swdn_vis_dir,'(a)') 'units = W/m2'
+
+  id_swdn_vis_dif = get_unit()
+  open(unit=id_swdn_vis_dif, file='DIAGNOSTICS/'//mod_name//'_swdn_vis_dif', form='formatted', action='write', position='rewind')
+  write(id_swdn_vis_dif,'(a)') 'units = W/m2'
+
+  id_swdn_total_dir = get_unit()
+  open(unit=id_swdn_total_dir, file='DIAGNOSTICS/'//mod_name//'_swdn_total_dir',form='formatted',action='write',position='rewind')
+  write(id_swdn_total_dir,'(a)') 'units = W/m2'
+
+  id_swdn_total_dif = get_unit()
+  open(unit=id_swdn_total_dif, file='DIAGNOSTICS/'//mod_name//'_swdn_total_dif',form='formatted',action='write',position='rewind')
+  write(id_swdn_total_dif,'(a)') 'units = W/m2'
+
+  id_sw = get_unit()
+  open(unit=id_sw, file='DIAGNOSTICS/'//mod_name//'_sw', form='formatted', action='write', position='rewind')
+  write(id_sw,'(a)') 'units = W/m2'
+
+  id_lw = get_unit()
+  open(unit=id_lw, file='DIAGNOSTICS/'//mod_name//'_lw', form='formatted', action='write', position='rewind')
+  write(id_lw,'(a)') 'units = W/m2'
+
+  id_ps = get_unit()
+  open(unit=id_ps, file='DIAGNOSTICS/'//mod_name//'_ps', form='formatted', action='write', position='rewind')
+  write(id_ps,'(a)') 'units = N/m2'
+
+  id_t = get_unit()
+  open(unit=id_t, file='DIAGNOSTICS/'//mod_name//'_t', form='formatted', action='write', position='rewind')
+  write(id_t,'(a)') 'units = degK'
+
+  id_z = get_unit()
+  open(unit=id_z, file='DIAGNOSTICS/'//mod_name//'_z', form='formatted', action='write', position='rewind')
+  write(id_z,'(a)') 'units = m'
+
+  id_q = get_unit()
+  open(unit=id_q, file='DIAGNOSTICS/'//mod_name//'_q', form='formatted', action='write', position='rewind')
+  write(id_q,'(a)') 'units = kg/kg'
+
+  id_u = get_unit()
+  open(unit=id_u, file='DIAGNOSTICS/'//mod_name//'_u', form='formatted', action='write', position='rewind')
+  write(id_u,'(a)') 'units = m/s'
+
+  id_v = get_unit()
+  open(unit=id_v, file='DIAGNOSTICS/'//mod_name//'_v', form='formatted', action='write', position='rewind')
+  write(id_v,'(a)') 'units = m/s'
+
+  id_lprec = get_unit()
+  open(unit=id_lprec, file='DIAGNOSTICS/'//mod_name//'_lprec', form='formatted', action='write', position='rewind')
+  write(id_lprec,'(a)') 'units = kg/(m2 s)'
+
+  id_fprec = get_unit()
+  open(unit=id_fprec, file='DIAGNOSTICS/'//mod_name//'_fprec', form='formatted', action='write', position='rewind')
+  write(id_fprec,'(a)') 'units = kg/(m2 s)'
+
+  id_swdn_inst = get_unit()
+  open(unit=id_swdn_inst, file='DIAGNOSTICS/'//mod_name//'_swdn_inst', form='formatted', action='write', position='rewind')
+  write(id_swdn_inst,'(a)') 'units = W/m2'
+
+  id_swdn_ave = get_unit()
+  open(unit=id_swdn_ave, file='DIAGNOSTICS/'//mod_name//'_swdn_ave', form='formatted', action='write', position='rewind')
+  write(id_swdn_ave,'(a)') 'units = W/m2'
+
+  id_cosz_inst = get_unit()
+  open(unit=id_cosz_inst, file='DIAGNOSTICS/'//mod_name//'_cosz_inst', form='formatted', action='write', position='rewind')
+  write(id_cosz_inst,'(a)') 'units = unitless'
+
+  id_cosz_ave = get_unit()
+  open(unit=id_cosz_ave, file='DIAGNOSTICS/'//mod_name//'_cosz_ave', form='formatted', action='write', position='rewind')
+  write(id_cosz_ave,'(a)') 'units = unitless'
+
+  id_fracday_inst = get_unit()
+  open(unit=id_fracday_inst, file='DIAGNOSTICS/'//mod_name//'_fracday_inst', form='formatted', action='write', position='rewind')
+  write(id_fracday_inst,'(a)') 'units = unitless'
+
+  id_fracday_ave = get_unit()
+  open(unit=id_fracday_ave, file='DIAGNOSTICS/'//mod_name//'_fracday_ave', form='formatted', action='write', position='rewind')
+  write(id_fracday_ave,'(a)') 'units = unitless'
+
+  do tr = 1, size(Atmos%tr_bot,3)
+     name = atmos_tracer_names(tr)
+     id_tr_bot(tr) = get_unit()
+     open(unit=id_tr_bot(tr),file='DIAGNOSTICS/'//mod_name//'_'//trim(name),form='formatted',action='write',position='rewind')
+     write(id_tr_bot(tr),'(a)') trim(atmos_tracer_longnames(tr))//'  units = '//trim(atmos_tracer_units(tr))
+  enddo
+
+end subroutine init_diag
+
+
+! ============================================================================
+subroutine diag_fast ( Atmos, Time )
+! writes fast time-scale diagnostics
+  type(atmos_data_type), intent(in) :: Atmos ! atmosphere state
+  type(time_type), intent(in) :: Time ! current time
+
+  ! ---- local vars ----------------------------------------------------------
+  logical used
+  real,dimension(size(Atmos%lprec,1),size(Atmos%lprec,2)) :: &
+       SW,fracday,cosz
+  real :: rrsun
+  integer :: tr, year, month, day, hour, minute, second
+  character(*), parameter :: diag_format='(i4,"-",i2.2,"-",i2.2,1x,i2.2,":",i2.2,":",i2.2,", ",1pe24.16)'
+  
+  call get_date(Time, year, month, day, hour, minute, second)
+!  write(id_swdn, diag_format) year, month, day, hour, minute, second,  atmos%flux_sw_down_total_dir+atmos%flux_sw_down_total_dif
+!  write(id_swdn_vis_dir, diag_format) year, month, day, hour, minute, second,  atmos%flux_sw_down_vis_dir
+!  write(id_swdn_total_dir, diag_format) year, month, day, hour, minute, second,  atmos%flux_sw_down_total_dir
+!  write(id_swdn_vis_dif, diag_format) year, month, day, hour, minute, second,  atmos%flux_sw_down_vis_dif
+!  write(id_swdn_total_dif, diag_format) year, month, day, hour, minute, second,  atmos%flux_sw_down_total_dif
+!  write(id_sw, diag_format) year, month, day, hour, minute, second,  Atmos%flux_sw
+!  write(id_lw, diag_format) year, month, day, hour, minute, second,  Atmos%flux_lw
+!  write(id_ps, diag_format) year, month, day, hour, minute, second,  Atmos%p_surf
+!  write(id_t, diag_format) year, month, day, hour, minute, second,  Atmos%t_bot
+!  write(id_q, diag_format) year, month, day, hour, minute, second,  Atmos%tr_bot(:,:,isphum)
+!  write(id_u, diag_format) year, month, day, hour, minute, second,  Atmos%u_bot
+!  write(id_v, diag_format) year, month, day, hour, minute, second,  Atmos%v_bot
+!  write(id_z, diag_format) year, month, day, hour, minute, second,  Atmos%z_bot
+!  write(id_lprec, diag_format) year, month, day, hour, minute, second,  Atmos%lprec
+!  write(id_fprec, diag_format) year, month, day, hour, minute, second,  Atmos%fprec
+
+  ! the fields below are purely to diagnoze astronomy module output, to
+  ! make sure it is consistent
+  cosz = 0; fracday = 0; SW = 0;
+  call diurnal_solar ( lat, lon, Atmos%time, cosz, fracday, rrsun, &
+       Atmos%time_step )
+  SW = cosz*fracday*rrsun
+!  write(id_swdn_inst, diag_format) year, month, day, hour, minute, second, SW
+!  write(id_cosz_inst, diag_format) year, month, day, hour, minute, second, cosz
+!  write(id_fracday_inst, diag_format) year, month, day, hour, minute, second, fracday
+
+  cosz = 0; fracday = 0; SW = 0;
+  call diurnal_solar ( lat, lon, Atmos%time, cosz, fracday, rrsun, Atmos%time_step*6 )
+  SW = cosz*fracday*rrsun
+!  write(id_swdn_ave, diag_format) year, month, day, hour, minute, second, SW
+!  write(id_cosz_ave, diag_format) year, month, day, hour, minute, second, cosz
+!  write(id_fracday_ave, diag_format) year, month, day, hour, minute, second, fracday
+
+  do tr = 1,size(Atmos%tr_bot,3)
+     write(id_tr_bot(tr), diag_format) year, month, day, hour, minute, second, Atmos%tr_bot(:,:,tr)
+  enddo
+
+end subroutine diag_fast
+! ============================================================================
+!subroutine atm_stock_pe (Atm, index, value)
+
+! dummy routine, coded only to satisfy required interface.
+
+!type(atmos_data_type), intent(inout) :: Atm
+!integer,               intent(in)    :: index
+!real,                  intent(out)   :: value
+
+!   value = 0.0
+!   if(.not.stock_warning_issued) then
+!      call error_mesg('atm_stock_pe','Stocks not yet implemented. Returning zero.',WARNING)
+!      stock_warning_issued = .true.
+!   endif
+
+!end subroutine atm_stock_pe
+! ============================================================================
+
+end module atmos_model_mod
